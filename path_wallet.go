@@ -22,12 +22,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/btcsuite/btcd/btcec"
+	"github.com/btcsuite/btcd/btcec/v2"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcd/btcutil"
 	"github.com/hashicorp/errwrap"
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/helper/cidrutil"
@@ -170,7 +170,7 @@ func ValidNetwork(network string) bool {
 
 // CreatePrivateKey will create a new private key for a particular network
 func (b *backend) CreatePrivateKey(network string) (*btcutil.WIF, error) {
-	secret, err := btcec.NewPrivateKey(btcec.S256())
+	secret, err := btcec.NewPrivateKey()
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (b *backend) CreateTransaction(config *Config, wif *btcutil.WIF, destAddr s
 	}
 	redeemTx.TxIn[0].SignatureScript = sigScript
 	flags := txscript.StandardVerifyFlags
-	vm, err := txscript.NewEngine(sourceTx.TxOut[0].PkScript, redeemTx, 0, flags, nil, nil, amount)
+	vm, err := txscript.NewEngine(sourceTx.TxOut[0].PkScript, redeemTx, 0, flags, nil, nil, amount, nil)
 	if err != nil {
 		return Transaction{}, err
 	}
