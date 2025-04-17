@@ -247,7 +247,8 @@ func (b *backend) CreateTransaction(config *Config, wif *btcutil.WIF, destAddr s
 	}
 	redeemTx.TxIn[0].SignatureScript = sigScript
 	flags := txscript.StandardVerifyFlags
-	vm, err := txscript.NewEngine(sourceTx.TxOut[0].PkScript, redeemTx, 0, flags, nil, nil, amount, nil)
+	pof := txscript.NewCannedPrevOutputFetcher(sourcePkScript, amount)
+	vm, err := txscript.NewEngine(sourceTx.TxOut[0].PkScript, redeemTx, 0, flags, nil, nil, amount, pof)
 	if err != nil {
 		return Transaction{}, err
 	}
